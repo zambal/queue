@@ -90,6 +90,6 @@ defmodule QueueTest do
     q1 = push_1_4
     q2 = for n <- 1..4, into: Queue.new(), do: n
 
-    q1 == q2
+    assert q1 == q2
   end
 end
