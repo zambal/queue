@@ -76,6 +76,19 @@ defmodule QueueTest do
     assert Queue.dropr(q) == %Queue{front: [4, 3], rear: [2]}
   end
 
+  test "join" do
+    q1 = push_1_4
+    q2 = pushr_1_4
+
+    assert Queue.join(q1, q2) == %Queue{front: [4, 3, 2, 1, 1], rear: [4, 3, 2]}
+  end
+
+  test "to_list" do
+    q = pushr_1_4
+
+    assert Queue.to_list(q) == [1, 2, 3, 4]
+  end
+
   test "Enumerable implementation" do
     q = push_1_4
 

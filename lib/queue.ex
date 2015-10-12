@@ -119,6 +119,22 @@ defmodule Queue do
     { :ok, item }
   end
 
+  @spec join(t, t) :: t
+  def join(%Queue{} = q, %Queue{front: [], rear: []}) do
+    q
+  end
+  def join(%Queue{front: [], rear: []}, %Queue{} = q) do
+    q
+  end
+  def join(%Queue{front: f1, rear: r1}, %Queue{front: f2, rear: r2}) do
+    %Queue{front: f1 ++ :lists.reverse(r1, f2), rear: r2}
+  end
+
+  @spec to_list(t) :: list
+  def to_list(%Queue{front: front, rear: rear}) do
+    front ++ :lists.reverse(rear, [])
+  end
+
   # Move half of elements from rear to front, if there are at least three
   defp r2f([]), do: %Queue{}
   defp r2f([_] = rear), do: %Queue{front: [], rear: rear}
