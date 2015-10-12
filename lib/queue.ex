@@ -25,7 +25,7 @@ defmodule Queue do
     %Queue{queue|rear: [item | rear]}
   end
 
-  @spec pop(t) :: { term, T } | :empty
+  @spec pop(t) :: { term, t } | :empty
   def pop(%Queue{front: [], rear: []}) do
     :empty
   end
@@ -43,7 +43,7 @@ defmodule Queue do
     { item, %Queue{queue|front: rest} }
   end
 
-  @spec popr(t) :: { term, T } | :empty
+  @spec popr(t) :: { term, t } | :empty
   def popr(%Queue{front: [], rear: []}) do
     :empty
   end
@@ -61,7 +61,7 @@ defmodule Queue do
     { item, %Queue{queue|rear: rest} }
   end
 
-  @spec drop(t) :: { term, T } | :empty
+  @spec drop(t) :: t | :empty
   def drop(%Queue{front: [], rear: []}) do
     :empty
   end
@@ -79,7 +79,7 @@ defmodule Queue do
     %Queue{queue|front: rest}
   end
 
-  @spec dropr(t) :: { term, T } | :empty
+  @spec dropr(t) :: t | :empty
   def dropr(%Queue{front: [], rear: []}) do
     :empty
   end
@@ -108,7 +108,7 @@ defmodule Queue do
     { :ok, item }
   end
 
-  @spec peek(t) :: { :ok, term } | :empty
+  @spec peekr(t) :: { :ok, term } | :empty
   def peekr(%Queue{front: [], rear: []}) do
     :empty
   end
