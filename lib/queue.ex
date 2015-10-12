@@ -37,7 +37,7 @@ defmodule Queue do
     { item, %Queue{front: front, rear: [last]} }
   end
   def pop(%Queue{front: [item], rear: rear}) do
-    { item, r2l(rear) }
+    { item, r2f(rear) }
   end
   def pop(%Queue{front: [item | rest]} = queue) do
     { item, %Queue{queue|front: rest} }
@@ -55,7 +55,7 @@ defmodule Queue do
     { item, %Queue{front: [first], rear: rear} }
   end
   def popr(%Queue{front: front, rear: [item]}) do
-    { item, l2r(front) }
+    { item, f2r(front) }
   end
   def popr(%Queue{rear: [item | rest]} = queue) do
     { item, %Queue{queue|rear: rest} }
@@ -73,7 +73,7 @@ defmodule Queue do
     %Queue{front: front, rear: [last]}
   end
   def drop(%Queue{front: [_item], rear: rear}) do
-    r2l(rear)
+    r2f(rear)
   end
   def drop(%Queue{front: [_item | rest]} = queue) do
     %Queue{queue|front: rest}
@@ -91,7 +91,7 @@ defmodule Queue do
     %Queue{front: [first], rear: rear}
   end
   def dropr(%Queue{front: front, rear: [_item]}) do
-    l2r(front)
+    f2r(front)
   end
   def dropr(%Queue{rear: [_item | rest]} = queue) do
     %Queue{queue|rear: rest}
@@ -120,19 +120,19 @@ defmodule Queue do
   end
 
   # Move half of elements from rear to front, if there are at least three
-  defp r2l([]), do: %Queue{}
-  defp r2l([_] = rear), do: %Queue{front: [], rear: rear}
-  defp r2l([x, y]), do: %Queue{front: [y], rear: [x]}
-  defp r2l(list) do
+  defp r2f([]), do: %Queue{}
+  defp r2f([_] = rear), do: %Queue{front: [], rear: rear}
+  defp r2f([x, y]), do: %Queue{front: [y], rear: [x]}
+  defp r2f(list) do
     { rear, front } = :lists.split(div(length(list), 2) + 1, list)
     %Queue{front: :lists.reverse(front, []), rear: rear}
   end
 
   # Move half of elements from front to rear, if there are enough
-  defp l2r([]), do: %Queue{};
-  defp l2r([_] = front), do: %Queue{front: [], rear: front}
-  defp l2r([x, y]), do: %Queue{front: [x], rear: [y]}
-  defp l2r(list) do
+  defp f2r([]), do: %Queue{};
+  defp f2r([_] = front), do: %Queue{front: [], rear: front}
+  defp f2r([x, y]), do: %Queue{front: [x], rear: [y]}
+  defp f2r(list) do
     { front, rear } = :lists.split(div(length(list), 2) + 1, list)
     %Queue{front: front, rear: :lists.reverse(rear, [])}
   end
