@@ -135,6 +135,11 @@ defmodule Queue do
     front ++ :lists.reverse(rear, [])
   end
 
+  @spec from_list(list) :: t
+  def from_list(items) do
+    f2r(items)
+  end
+
   @spec to_erl(t) :: { list, list }
   def to_erl(%Queue{front: front, rear: rear}) do
     { rear, front }

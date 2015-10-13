@@ -89,6 +89,13 @@ defmodule QueueTest do
     assert Queue.to_list(q) == [1, 2, 3, 4]
   end
 
+  test "from_list" do
+    q1 = Enum.reduce(4..1, Queue.new(), fn n, acc -> Queue.put_front(acc, n) end)
+    q2 = Queue.from_list([1, 2, 3, 4])
+
+    assert q1 == q2
+  end
+
   test "to and from erl" do
     q = put_1_4
     eq = :queue.new
