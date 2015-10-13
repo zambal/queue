@@ -9,19 +9,19 @@ defmodule Queue do
     %Queue{}
   end
 
-  @spec push(t, term) :: t
-  def push(%Queue{front: front = [_], rear: []}, item) do
+  @spec put(t, term) :: t
+  def put(%Queue{front: front = [_], rear: []}, item) do
     %Queue{front: [item], rear: front}
   end
-  def push(%Queue{front: front} = queue, item) do
+  def put(%Queue{front: front} = queue, item) do
     %Queue{queue|front: [item | front]}
   end
 
-  @spec pushr(t, term) :: t
-  def pushr(%Queue{front: [], rear: rear = [_]}, item) do
+  @spec put_rear(t, term) :: t
+  def put_rear(%Queue{front: [], rear: rear = [_]}, item) do
     %Queue{front: rear, rear: [item]}
   end
-  def pushr(%Queue{rear: rear} = queue, item) do
+  def put_rear(%Queue{rear: rear} = queue, item) do
     %Queue{queue|rear: [item | rear]}
   end
 
@@ -29,93 +29,93 @@ defmodule Queue do
   def pop(%Queue{front: [], rear: []}) do
     :empty
   end
-  def pop(%Queue{front: [], rear: [item]}) do
+  def pop(%Queue{front: [item], rear: []}) do
     { item, %Queue{front: [], rear: []} }
   end
-  def pop(%Queue{front: [], rear: [last | rest]}) do
-    [item | front] = :lists.reverse(rest, [])
-    { item, %Queue{front: front, rear: [last]} }
-  end
-  def pop(%Queue{front: [item], rear: rear}) do
-    { item, r2f(rear) }
-  end
-  def pop(%Queue{front: [item | rest]} = queue) do
-    { item, %Queue{queue|front: rest} }
-  end
-
-  @spec popr(t) :: { term, t } | :empty
-  def popr(%Queue{front: [], rear: []}) do
-    :empty
-  end
-  def popr(%Queue{front: [item], rear: []}) do
-    { item, %Queue{front: [], rear: []} }
-  end
-  def popr(%Queue{front: [first | rest], rear: []}) do
+  def pop(%Queue{front: [first | rest], rear: []}) do
     [item | rear] = :lists.reverse(rest, [])
     { item, %Queue{front: [first], rear: rear} }
   end
-  def popr(%Queue{front: front, rear: [item]}) do
+  def pop(%Queue{front: front, rear: [item]}) do
     { item, f2r(front) }
   end
-  def popr(%Queue{rear: [item | rest]} = queue) do
+  def pop(%Queue{rear: [item | rest]} = queue) do
     { item, %Queue{queue|rear: rest} }
+  end
+
+  @spec pop_front(t) :: { term, t } | :empty
+  def pop_front(%Queue{front: [], rear: []}) do
+    :empty
+  end
+  def pop_front(%Queue{front: [], rear: [item]}) do
+    { item, %Queue{front: [], rear: []} }
+  end
+  def pop_front(%Queue{front: [], rear: [last | rest]}) do
+    [item | front] = :lists.reverse(rest, [])
+    { item, %Queue{front: front, rear: [last]} }
+  end
+  def pop_front(%Queue{front: [item], rear: rear}) do
+    { item, r2f(rear) }
+  end
+  def pop_front(%Queue{front: [item | rest]} = queue) do
+    { item, %Queue{queue|front: rest} }
   end
 
   @spec drop(t) :: t | :empty
   def drop(%Queue{front: [], rear: []}) do
     :empty
   end
-  def drop(%Queue{front: [], rear: [_item]}) do
+  def drop(%Queue{front: [_item], rear: []}) do
     %Queue{front: [], rear: []}
   end
-  def drop(%Queue{front: [], rear: [last | rest]}) do
-    [_item | front] = :lists.reverse(rest, [])
-    %Queue{front: front, rear: [last]}
-  end
-  def drop(%Queue{front: [_item], rear: rear}) do
-    r2f(rear)
-  end
-  def drop(%Queue{front: [_item | rest]} = queue) do
-    %Queue{queue|front: rest}
-  end
-
-  @spec dropr(t) :: t | :empty
-  def dropr(%Queue{front: [], rear: []}) do
-    :empty
-  end
-  def dropr(%Queue{front: [_item], rear: []}) do
-    %Queue{front: [], rear: []}
-  end
-  def dropr(%Queue{front: [first | rest], rear: []}) do
+  def drop(%Queue{front: [first | rest], rear: []}) do
     [_item | rear] = :lists.reverse(rest, [])
     %Queue{front: [first], rear: rear}
   end
-  def dropr(%Queue{front: front, rear: [_item]}) do
+  def drop(%Queue{front: front, rear: [_item]}) do
     f2r(front)
   end
-  def dropr(%Queue{rear: [_item | rest]} = queue) do
+  def drop(%Queue{rear: [_item | rest]} = queue) do
     %Queue{queue|rear: rest}
+  end
+
+  @spec drop_front(t) :: t | :empty
+  def drop_front(%Queue{front: [], rear: []}) do
+    :empty
+  end
+  def drop_front(%Queue{front: [], rear: [_item]}) do
+    %Queue{front: [], rear: []}
+  end
+  def drop_front(%Queue{front: [], rear: [last | rest]}) do
+    [_item | front] = :lists.reverse(rest, [])
+    %Queue{front: front, rear: [last]}
+  end
+  def drop_front(%Queue{front: [_item], rear: rear}) do
+    r2f(rear)
+  end
+  def drop_front(%Queue{front: [_item | rest]} = queue) do
+    %Queue{queue|front: rest}
   end
 
   @spec peek(t) :: { :ok, term } | :empty
   def peek(%Queue{front: [], rear: []}) do
     :empty
   end
-  def peek(%Queue{front: [item | _]}) do
+  def peek(%Queue{rear: [item | _]}) do
     { :ok, item }
   end
-  def peek(%Queue{front: [], rear: [item]}) do
+  def peek(%Queue{front: [item], rear: []}) do
     { :ok, item }
   end
 
-  @spec peekr(t) :: { :ok, term } | :empty
-  def peekr(%Queue{front: [], rear: []}) do
+  @spec peek_front(t) :: { :ok, term } | :empty
+  def peek_front(%Queue{front: [], rear: []}) do
     :empty
   end
-  def peekr(%Queue{rear: [item | _]}) do
+  def peek_front(%Queue{front: [item | _]}) do
     { :ok, item }
   end
-  def peekr(%Queue{front: [item], rear: []}) do
+  def peek_front(%Queue{front: [], rear: [item]}) do
     { :ok, item }
   end
 
@@ -132,7 +132,7 @@ defmodule Queue do
 
   @spec to_list(t) :: list
   def to_list(%Queue{front: front, rear: rear}) do
-    front ++ :lists.reverse(rear, [])
+    rear ++ :lists.reverse(front, [])
   end
 
   # Move half of elements from rear to front, if there are at least three
@@ -175,19 +175,19 @@ defimpl Enumerable, for: Queue do
   defp do_reduce(%Queue{front: [], rear: []}, { :cont, acc }, _fun) do
     { :cont, acc }
   end
-  defp do_reduce(%Queue{front: [item | rest]} = queue, { :cont, acc }, fun) do
-    do_reduce(%Queue{queue|front: rest}, fun.(item, acc), fun)
+  defp do_reduce(%Queue{rear: [item | rest]} = queue, { :cont, acc }, fun) do
+    do_reduce(%Queue{queue|rear: rest}, fun.(item, acc), fun)
   end
-  defp do_reduce(%Queue{front: [], rear: rear}, { :cont, acc }, fun) do
-    [item | rest] = :lists.reverse(rear, [])
-    do_reduce(%Queue{front: rest, rear: []}, fun.(item, acc), fun)
+  defp do_reduce(%Queue{front: front, rear: []}, { :cont, acc }, fun) do
+    [item | rest] = :lists.reverse(front, [])
+    do_reduce(%Queue{front: [], rear: rest}, fun.(item, acc), fun)
   end
 end
 
 defimpl Collectable, for: Queue do
   def into(original) do
     { original, fn
-      queue, { :cont, item } -> Queue.push(queue, item)
+      queue, { :cont, item } -> Queue.put(queue, item)
       queue, :done -> queue
       _, :halt -> :ok
     end }
