@@ -89,6 +89,28 @@ defmodule QueueTest do
     assert Queue.to_list(q) == [1, 2, 3, 4]
   end
 
+  test "to and from erl" do
+    q = put_1_4
+    eq = :queue.new
+    eq = :queue.in(1, eq)
+    eq = :queue.in(2, eq)
+    eq = :queue.in(3, eq)
+    eq = :queue.in(4, eq)
+
+    assert Queue.to_erl(q) == eq
+    assert Queue.from_erl(eq) == q
+
+    q = put_front_1_4
+    eq = :queue.new
+    eq = :queue.in_r(1, eq)
+    eq = :queue.in_r(2, eq)
+    eq = :queue.in_r(3, eq)
+    eq = :queue.in_r(4, eq)
+
+    assert Queue.to_erl(q) == eq
+    assert Queue.from_erl(eq) == q
+  end
+
   test "Enumerable implementation" do
     q = put_1_4
 

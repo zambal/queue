@@ -135,6 +135,16 @@ defmodule Queue do
     front ++ :lists.reverse(rear, [])
   end
 
+  @spec to_erl(t) :: { list, list }
+  def to_erl(%Queue{front: front, rear: rear}) do
+    { rear, front }
+  end
+
+  @spec from_erl({ list, list }) :: t
+  def from_erl({ rear, front }) when is_list(rear) and is_list(front) do
+    %Queue{front: front, rear: rear}
+  end
+
   @spec size(t) :: non_neg_integer
   def size(%Queue{front: front, rear: rear}) do
     length(front) + length(rear)
