@@ -172,29 +172,35 @@ defimpl Enumerable, for: Queue do
   def count(queue),       do: { :ok, Queue.size(queue) }
   def member?(queue, x), do: { :ok, Queue.member?(queue, x) }
 
-  def reduce(queue, acc, fun) do
-    case do_reduce(queue, acc, fun) do
-      { :cont, acc }    -> { :done, acc }
-      { :suspend, acc } -> { :suspended, acc }
-      { :halt, acc }    -> { :halted, acc }
+  def reduce(%Queue{front: front, rear: rear}, acc, fun) do
+    rear_acc = do_reduce(rear, acc, fun)
+    case do_reduce(:lists.reverse(front, []), rear_acc, fun) do
+      { :cont, acc } ->
+        { :done, acc }
+      { :halt, acc } ->
+        { :halted, acc }
+      suspended ->
+        suspended
     end
   end
 
+  defp do_reduce([h | t], { :cont, acc }, fun) do
+    do_reduce(t, fun.(h, acc), fun)
+  end
+  defp do_reduce([], { :cont, acc }, _fun) do
+    { :cont, acc }
+  end
   defp do_reduce(_queue, { :halt, acc }, _fun) do
     { :halt, acc }
   end
   defp do_reduce(queue, { :suspend, acc }, fun) do
-    { :suspend, acc, &do_reduce(queue, &1, fun) }
+    { :suspended, acc, &do_reduce(queue, &1, fun) }
   end
-  defp do_reduce(%Queue{front: [], rear: []}, { :cont, acc }, _fun) do
-    { :cont, acc }
-  end
-  defp do_reduce(%Queue{rear: [item | rest]} = queue, { :cont, acc }, fun) do
-    do_reduce(%Queue{queue|rear: rest}, fun.(item, acc), fun)
-  end
-  defp do_reduce(%Queue{front: front, rear: []}, { :cont, acc }, fun) do
-    [item | rest] = :lists.reverse(front, [])
-    do_reduce(%Queue{front: [], rear: rest}, fun.(item, acc), fun)
+  defp do_reduce(queue, { :suspended, acc, continuation }, fun) do
+    { :suspended, acc, fn acc ->
+      rear_acc = continuation.(acc)
+      do_reduce(queue, rear_acc, fun)
+    end }
   end
 end
 
