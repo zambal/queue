@@ -135,6 +135,20 @@ defmodule Queue do
     rear ++ :lists.reverse(front, [])
   end
 
+  @spec size(t) :: non_neg_integer
+  def size(%Queue{front: front, rear: rear}) do
+    length(front) + length(rear)
+  end
+
+  @spec member?(t, term) :: boolean
+  def member?(%Queue{front: front, rear: rear}, item) do
+    do_member?(rear, item) or do_member?(front, item)
+  end
+
+  defp do_member?([h | _t], x) when h == x, do: true
+  defp do_member?([_h | t], x), do: do_member?(t, x)
+  defp do_member?([], _x), do: false
+
   # Move half of elements from rear to front, if there are at least three
   defp r2f([]), do: %Queue{}
   defp r2f([_] = rear), do: %Queue{front: [], rear: rear}
@@ -155,8 +169,8 @@ defmodule Queue do
 end
 
 defimpl Enumerable, for: Queue do
-  def count(_queue),           do: { :error, __MODULE__ }
-  def member?(_queue, _),      do: { :error, __MODULE__ }
+  def count(queue),       do: { :ok, Queue.size(queue) }
+  def member?(queue, x), do: { :ok, Queue.member?(queue, x) }
 
   def reduce(queue, acc, fun) do
     case do_reduce(queue, acc, fun) do
