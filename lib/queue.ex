@@ -195,8 +195,9 @@ defimpl Collectable, for: Queue do
 end
 
 defimpl Inspect, for: Queue do
-  def inspect(%Queue{front: front, rear: rear}, _opts) do
-    items = front ++ :lists.reverse(rear, [])
-    "#Queue<" <> inspect(items) <> ">"
+  import Inspect.Algebra
+
+  def inspect(%Queue{} = queue, opts) do
+    concat ["#Queue<", to_doc(Queue.to_list(queue), opts), ">"]
   end
 end
