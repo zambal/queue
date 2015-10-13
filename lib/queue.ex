@@ -4,11 +4,13 @@ defmodule Queue do
   defstruct front: [], rear: []
   @type t :: %Queue{front: list, rear: list}
 
+  @doc "Returns a new empty queue"
   @spec new :: t
   def new do
     %Queue{}
   end
 
+  @doc "Puts the given value at the end the queue"
   @spec put(t, term) :: t
   def put(%Queue{front: [], rear: rear = [_]}, item) do
     %Queue{front: rear, rear: [item]}
@@ -17,6 +19,11 @@ defmodule Queue do
     %Queue{queue|rear: [item | rear]}
   end
 
+  @doc """
+  Puts the given value at the front of the queue
+
+  This means that it will be the first item in the queue to pop, peek, or drop.
+  """
   @spec put_front(t, term) :: t
   def put_front(%Queue{front: front = [_], rear: []}, item) do
     %Queue{front: [item], rear: front}
@@ -25,6 +32,12 @@ defmodule Queue do
     %Queue{queue|front: [item | front]}
   end
 
+  @doc """
+  Pop the first value from the front of the queue
+
+  Returns the value as well the rest of the queue or `:empty` if the queue has
+  no items.
+  """
   @spec pop(t) :: { term, t } | :empty
   def pop(%Queue{front: [], rear: []}) do
     :empty
@@ -43,6 +56,12 @@ defmodule Queue do
     { item, %Queue{queue|front: rest} }
   end
 
+  @doc """
+  Pop the last value from the rear of the queue
+
+  Returns the value as well the rest of the queue or `:empty` if the queue has
+  no items.
+  """
   @spec pop_rear(t) :: { term, t } | :empty
   def pop_rear(%Queue{front: [], rear: []}) do
     :empty
@@ -61,6 +80,11 @@ defmodule Queue do
     { item, %Queue{queue|rear: rest} }
   end
 
+  @doc """
+  Remove the first value from the front of the queue
+
+  Returns the rest of the queue or `:empty` if the queue has no items.
+  """
   @spec drop(t) :: t | :empty
   def drop(%Queue{front: [], rear: []}) do
     :empty
@@ -79,6 +103,11 @@ defmodule Queue do
     %Queue{queue|front: rest}
   end
 
+  @doc """
+  Remove the last value from the rear of the queue
+
+  Returns the rest of the queue or `:empty` if the queue has no items.
+  """
   @spec drop_rear(t) :: t | :empty
   def drop_rear(%Queue{front: [], rear: []}) do
     :empty
@@ -97,6 +126,11 @@ defmodule Queue do
     %Queue{queue|rear: rest}
   end
 
+  @doc """
+  Get the first value from the front of the queue without removing it
+
+  Returns the `{:ok, value}` or `:empty` if the queue has no items.
+  """
   @spec peek(t) :: { :ok, term } | :empty
   def peek(%Queue{front: [], rear: []}) do
     :empty
@@ -108,6 +142,11 @@ defmodule Queue do
     { :ok, item }
   end
 
+  @doc """
+  Get the last value from the rear of the queue without removing it
+
+  Returns the `{:ok, value}` or `:empty` if the queue has no items.
+  """
   @spec peek_rear(t) :: { :ok, term } | :empty
   def peek_rear(%Queue{front: [], rear: []}) do
     :empty
@@ -119,6 +158,11 @@ defmodule Queue do
     { :ok, item }
   end
 
+  @doc """
+  Join two queues
+
+  It effectively appends the second queue to the first queue.
+  """
   @spec join(t, t) :: t
   def join(%Queue{} = q, %Queue{front: [], rear: []}) do
     q
@@ -130,31 +174,45 @@ defmodule Queue do
     %Queue{front: f1 ++ :lists.reverse(r1, f2), rear: r2}
   end
 
+  @doc """
+  Converts a queue to a list
+
+  The front item of the queue will be the first element in the list.
+  """
   @spec to_list(t) :: list
   def to_list(%Queue{front: front, rear: rear}) do
     front ++ :lists.reverse(rear, [])
   end
 
+  @doc """
+  Converts a list to a queue
+
+  The first element in the list will be the front item of the queue.
+  """
   @spec from_list(list) :: t
   def from_list(items) do
     f2r(items)
   end
 
+  @doc "Converts a queue to Erlang's queue data type"
   @spec to_erl(t) :: { list, list }
   def to_erl(%Queue{front: front, rear: rear}) do
     { rear, front }
   end
 
+  @doc "Converts Erlang's queue data type to a queue"
   @spec from_erl({ list, list }) :: t
   def from_erl({ rear, front }) when is_list(rear) and is_list(front) do
     %Queue{front: front, rear: rear}
   end
 
+  @doc "Returns the number of items in the queue"
   @spec size(t) :: non_neg_integer
   def size(%Queue{front: front, rear: rear}) do
     length(front) + length(rear)
   end
 
+  @doc "Returns true if the given value is an item in the queue"
   @spec member?(t, term) :: boolean
   def member?(%Queue{front: front, rear: rear}, item) do
     do_member?(front, item) or do_member?(rear, item)
