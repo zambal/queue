@@ -212,15 +212,11 @@ defmodule Queue do
     length(front) + length(rear)
   end
 
-  @doc "Returns true if the given value is an item in the queue"
+  @doc "Returns true if the given value exists in the queue"
   @spec member?(t, term) :: boolean
   def member?(%Queue{front: front, rear: rear}, item) do
-    do_member?(front, item) or do_member?(rear, item)
+    :lists.member(item, rear) or :lists.member(item, front)
   end
-
-  defp do_member?([h | _t], x) when h == x, do: true
-  defp do_member?([_h | t], x), do: do_member?(t, x)
-  defp do_member?([], _x), do: false
 
   # Move half of elements from rear to front, if there are at least three
   defp r2f([]), do: %Queue{}
