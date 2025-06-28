@@ -9,13 +9,18 @@ defmodule Quex.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
 
-      # Docs
+      # Package
       name: "Quex",
-      source_url: "https://github.com/zambal/queue",
-      docs: [
-        # The main page in the docs
-        main: "Quex",
-        extras: ["README.md"]
+      source_url: "https://github.com/zambal/quex",
+      description: """
+      An efficient implementation of double ended fifo queues
+      """,
+      package: [
+        name: :quex,
+        files: ~w(lib test mix.exs README.md LICENSE),
+        maintainers: ["Vincent Siliakus"],
+        licenses: ["Apache-2.0"],
+        links: %{"Github" => "https://github.com/zambal/quex"}
       ]
     ]
   end
