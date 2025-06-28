@@ -18,118 +18,119 @@ defmodule QueueTest do
   end
 
   test "new queue" do
-    assert Queue.new() == %Queue{front: [], rear: []}
+    assert %Queue{front: [], rear: []} = Queue.new()
   end
 
   test "put item" do
     q = Queue.new()
-    assert Queue.put(q, 1) == %Queue{front: [], rear: [1]}
+    assert %Queue{front: [], rear: [1]} = Queue.put(q, 1)
   end
 
   test "put_front item" do
     q = Queue.new()
-    assert Queue.put_front(q, 1) == %Queue{front: [1], rear: []}
+    assert %Queue{front: [1], rear: []} = Queue.put_front(q, 1)
   end
 
   test "put and pop from queue" do
-    q = put_1_4
-    assert Queue.pop(q) == { 1, %Queue{rear: [4, 3], front: [2]} }
+    q = put_1_4()
+    assert {1, %Queue{rear: [4, 3], front: [2]}} = Queue.pop(q)
   end
 
   test "put and pop_front from queue" do
-    q = put_1_4
-    assert Queue.pop_rear(q) == { 4, %Queue{rear: [3, 2], front: [1]} }
+    q = put_1_4()
+    assert {4, %Queue{rear: [3, 2], front: [1]}} = Queue.pop_rear(q)
   end
 
   test "put_rear and pop_rear from queue" do
-    q = put_front_1_4
-    assert Queue.pop_rear(q) == { 1, %Queue{rear: [2], front: [4, 3]} }
+    q = put_front_1_4()
+    assert {1, %Queue{rear: [2], front: [4, 3]}} = Queue.pop_rear(q)
   end
 
   test "pop from empty queue" do
     q = Queue.new()
-    assert Queue.pop(q) == :empty
+    assert :empty = Queue.pop(q)
   end
 
   test "peek queue" do
-    q = put_1_4
-    assert Queue.peek(q) == { :ok, 1 }
+    q = put_1_4()
+    assert {:ok, 1} = Queue.peek(q)
   end
 
   test "peek_rear queue" do
-    q = put_1_4
-    assert Queue.peek_rear(q) == { :ok, 4 }
+    q = put_1_4()
+    assert {:ok, 4} = Queue.peek_rear(q)
   end
 
   test "peek empty queue" do
     q = Queue.new()
-    assert Queue.peek(q) == :empty
+    assert :empty = Queue.peek(q)
   end
 
   test "drop from queue" do
-    q = put_1_4
-    assert Queue.drop(q) == %Queue{rear: [4, 3], front: [2]}
+    q = put_1_4()
+    assert %Queue{rear: [4, 3], front: [2]} = Queue.drop(q)
   end
 
   test "drop_rear from queue" do
-    q = put_1_4
-    assert Queue.drop_rear(q) == %Queue{rear: [3, 2], front: [1]}
+    q = put_1_4()
+    assert %Queue{rear: [3, 2], front: [1]} = Queue.drop_rear(q)
   end
 
   test "join" do
-    q1 = put_1_4
-    q2 = put_front_1_4
+    q1 = put_1_4()
+    q2 = put_front_1_4()
 
-    assert Queue.join(q1, q2) == %Queue{front: [1, 2, 3, 4, 4, 3, 2], rear: [1]}
+    assert %Queue{front: [1, 2, 3, 4, 4, 3, 2], rear: [1]} = Queue.join(q1, q2)
   end
 
   test "to_list" do
-    q = put_1_4
+    q = put_1_4()
 
-    assert Queue.to_list(q) == [1, 2, 3, 4]
+    assert [1, 2, 3, 4] = Queue.to_list(q)
   end
 
   test "from_list" do
-    q1 = Enum.reduce(4..1, Queue.new(), fn n, acc -> Queue.put_front(acc, n) end)
+    q1 = Enum.reduce(4..1//-1, Queue.new(), fn n, acc -> Queue.put_front(acc, n) end)
     q2 = Queue.from_list([1, 2, 3, 4])
 
     assert q1 == q2
   end
 
   test "to and from erl" do
-    q = put_1_4
-    eq = :queue.new
+    q = put_1_4()
+    eq = :queue.new()
     eq = :queue.in(1, eq)
     eq = :queue.in(2, eq)
     eq = :queue.in(3, eq)
     eq = :queue.in(4, eq)
 
-    assert Queue.to_erl(q) == eq
-    assert Queue.from_erl(eq) == q
+    assert ^eq = Queue.to_erl(q)
+    assert ^q = Queue.from_erl(eq)
 
-    q = put_front_1_4
-    eq = :queue.new
+    q = put_front_1_4()
+    eq = :queue.new()
     eq = :queue.in_r(1, eq)
     eq = :queue.in_r(2, eq)
     eq = :queue.in_r(3, eq)
     eq = :queue.in_r(4, eq)
 
-    assert Queue.to_erl(q) == eq
-    assert Queue.from_erl(eq) == q
+    assert ^eq = Queue.to_erl(q)
+    assert ^q = Queue.from_erl(eq)
   end
 
   test "Enumerable implementation" do
-    q = put_1_4
+    q = put_1_4()
 
-    assert Enum.map(q, &(&1)) == [1, 2, 3, 4]
-    assert Enum.member?(q, 3) == true
-    assert Enum.member?(q, 0) == false
-    assert Enum.count(q) == 4
-    assert Enum.take_while(q, &(&1 < 3)) == [1, 2]
+    assert [1, 2, 3, 4] = Enum.map(q, & &1)
+    assert true = Enum.member?(q, 3)
+    assert false === Enum.member?(q, 0)
+    assert 4 = Enum.count(q)
+    assert [1, 2] = Enum.take_while(q, &(&1 < 3))
+    assert [3, 4] = Enum.slice(q, 2..3)
   end
 
   test "Collectable implementation" do
-    q1 = put_1_4
+    q1 = put_1_4()
     q2 = for n <- 1..4, into: Queue.new(), do: n
 
     assert q1 == q2
