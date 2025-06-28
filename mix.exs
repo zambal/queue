@@ -1,20 +1,20 @@
-defmodule Queue.MixProject do
+defmodule Quex.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :queue,
-      version: "1.0.0",
-      elixir: "~> 1.0",
+      app: :quex,
+      version: "1.0.1",
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
 
       # Docs
-      name: "Queue",
+      name: "Quex",
       source_url: "https://github.com/zambal/queue",
       docs: [
         # The main page in the docs
-        main: "Queue",
+        main: "Quex",
         extras: ["README.md"]
       ]
     ]

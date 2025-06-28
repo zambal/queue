@@ -1,23 +1,33 @@
-defmodule Queue do
+defmodule Quex do
   @moduledoc File.read!("README.md")
 
   defstruct front: [], rear: []
-  @type t :: %Queue{front: list, rear: list}
+  @type t :: %Quex{front: list, rear: list}
 
-  @doc "Returns a new empty queue"
+  @doc "Creates a new empty queue"
   @spec new :: t
   def new do
-    %Queue{}
+    %Quex{}
+  end
+
+  @doc """
+  Creates a new queue from a list
+
+  The first element in the list will be the front item of the queue.
+  """
+  @spec new(list) :: t
+  def new(items) do
+    f2r(items)
   end
 
   @doc "Puts the given value at the end the queue"
   @spec put(t, term) :: t
-  def put(%Queue{front: [], rear: rear = [_]}, item) do
-    %Queue{front: rear, rear: [item]}
+  def put(%Quex{front: [], rear: rear = [_]}, item) do
+    %Quex{front: rear, rear: [item]}
   end
 
-  def put(%Queue{rear: rear} = queue, item) do
-    %Queue{queue | rear: [item | rear]}
+  def put(%Quex{rear: rear} = queue, item) do
+    %Quex{queue | rear: [item | rear]}
   end
 
   @doc """
@@ -26,12 +36,12 @@ defmodule Queue do
   This means that it will be the first item in the queue to pop, peek, or drop.
   """
   @spec put_front(t, term) :: t
-  def put_front(%Queue{front: front = [_], rear: []}, item) do
-    %Queue{front: [item], rear: front}
+  def put_front(%Quex{front: front = [_], rear: []}, item) do
+    %Quex{front: [item], rear: front}
   end
 
-  def put_front(%Queue{front: front} = queue, item) do
-    %Queue{queue | front: [item | front]}
+  def put_front(%Quex{front: front} = queue, item) do
+    %Quex{queue | front: [item | front]}
   end
 
   @doc """
@@ -41,25 +51,25 @@ defmodule Queue do
   no items.
   """
   @spec pop(t) :: {term, t} | :empty
-  def pop(%Queue{front: [], rear: []}) do
+  def pop(%Quex{front: [], rear: []}) do
     :empty
   end
 
-  def pop(%Queue{front: [], rear: [item]}) do
-    {item, %Queue{front: [], rear: []}}
+  def pop(%Quex{front: [], rear: [item]}) do
+    {item, %Quex{front: [], rear: []}}
   end
 
-  def pop(%Queue{front: [], rear: [last | rest]}) do
+  def pop(%Quex{front: [], rear: [last | rest]}) do
     [item | front] = :lists.reverse(rest, [])
-    {item, %Queue{front: front, rear: [last]}}
+    {item, %Quex{front: front, rear: [last]}}
   end
 
-  def pop(%Queue{front: [item], rear: rear}) do
+  def pop(%Quex{front: [item], rear: rear}) do
     {item, r2f(rear)}
   end
 
-  def pop(%Queue{front: [item | rest]} = queue) do
-    {item, %Queue{queue | front: rest}}
+  def pop(%Quex{front: [item | rest]} = queue) do
+    {item, %Quex{queue | front: rest}}
   end
 
   @doc """
@@ -69,25 +79,25 @@ defmodule Queue do
   no items.
   """
   @spec pop_rear(t) :: {term, t} | :empty
-  def pop_rear(%Queue{front: [], rear: []}) do
+  def pop_rear(%Quex{front: [], rear: []}) do
     :empty
   end
 
-  def pop_rear(%Queue{front: [item], rear: []}) do
-    {item, %Queue{front: [], rear: []}}
+  def pop_rear(%Quex{front: [item], rear: []}) do
+    {item, %Quex{front: [], rear: []}}
   end
 
-  def pop_rear(%Queue{front: [first | rest], rear: []}) do
+  def pop_rear(%Quex{front: [first | rest], rear: []}) do
     [item | rear] = :lists.reverse(rest, [])
-    {item, %Queue{front: [first], rear: rear}}
+    {item, %Quex{front: [first], rear: rear}}
   end
 
-  def pop_rear(%Queue{front: front, rear: [item]}) do
+  def pop_rear(%Quex{front: front, rear: [item]}) do
     {item, f2r(front)}
   end
 
-  def pop_rear(%Queue{rear: [item | rest]} = queue) do
-    {item, %Queue{queue | rear: rest}}
+  def pop_rear(%Quex{rear: [item | rest]} = queue) do
+    {item, %Quex{queue | rear: rest}}
   end
 
   @doc """
@@ -96,25 +106,25 @@ defmodule Queue do
   Returns the rest of the queue or `:empty` if the queue has no items.
   """
   @spec drop(t) :: t | :empty
-  def drop(%Queue{front: [], rear: []}) do
+  def drop(%Quex{front: [], rear: []}) do
     :empty
   end
 
-  def drop(%Queue{front: [], rear: [_item]}) do
-    %Queue{front: [], rear: []}
+  def drop(%Quex{front: [], rear: [_item]}) do
+    %Quex{front: [], rear: []}
   end
 
-  def drop(%Queue{front: [], rear: [last | rest]}) do
+  def drop(%Quex{front: [], rear: [last | rest]}) do
     [_item | front] = :lists.reverse(rest, [])
-    %Queue{front: front, rear: [last]}
+    %Quex{front: front, rear: [last]}
   end
 
-  def drop(%Queue{front: [_item], rear: rear}) do
+  def drop(%Quex{front: [_item], rear: rear}) do
     r2f(rear)
   end
 
-  def drop(%Queue{front: [_item | rest]} = queue) do
-    %Queue{queue | front: rest}
+  def drop(%Quex{front: [_item | rest]} = queue) do
+    %Quex{queue | front: rest}
   end
 
   @doc """
@@ -123,25 +133,25 @@ defmodule Queue do
   Returns the rest of the queue or `:empty` if the queue has no items.
   """
   @spec drop_rear(t) :: t | :empty
-  def drop_rear(%Queue{front: [], rear: []}) do
+  def drop_rear(%Quex{front: [], rear: []}) do
     :empty
   end
 
-  def drop_rear(%Queue{front: [_item], rear: []}) do
-    %Queue{front: [], rear: []}
+  def drop_rear(%Quex{front: [_item], rear: []}) do
+    %Quex{front: [], rear: []}
   end
 
-  def drop_rear(%Queue{front: [first | rest], rear: []}) do
+  def drop_rear(%Quex{front: [first | rest], rear: []}) do
     [_item | rear] = :lists.reverse(rest, [])
-    %Queue{front: [first], rear: rear}
+    %Quex{front: [first], rear: rear}
   end
 
-  def drop_rear(%Queue{front: front, rear: [_item]}) do
+  def drop_rear(%Quex{front: front, rear: [_item]}) do
     f2r(front)
   end
 
-  def drop_rear(%Queue{rear: [_item | rest]} = queue) do
-    %Queue{queue | rear: rest}
+  def drop_rear(%Quex{rear: [_item | rest]} = queue) do
+    %Quex{queue | rear: rest}
   end
 
   @doc """
@@ -150,15 +160,15 @@ defmodule Queue do
   Returns the `{:ok, value}` or `:empty` if the queue has no items.
   """
   @spec peek(t) :: {:ok, term} | :empty
-  def peek(%Queue{front: [], rear: []}) do
+  def peek(%Quex{front: [], rear: []}) do
     :empty
   end
 
-  def peek(%Queue{front: [item | _]}) do
+  def peek(%Quex{front: [item | _]}) do
     {:ok, item}
   end
 
-  def peek(%Queue{front: [], rear: [item]}) do
+  def peek(%Quex{front: [], rear: [item]}) do
     {:ok, item}
   end
 
@@ -168,15 +178,15 @@ defmodule Queue do
   Returns the `{:ok, value}` or `:empty` if the queue has no items.
   """
   @spec peek_rear(t) :: {:ok, term} | :empty
-  def peek_rear(%Queue{front: [], rear: []}) do
+  def peek_rear(%Quex{front: [], rear: []}) do
     :empty
   end
 
-  def peek_rear(%Queue{rear: [item | _]}) do
+  def peek_rear(%Quex{rear: [item | _]}) do
     {:ok, item}
   end
 
-  def peek_rear(%Queue{front: [item], rear: []}) do
+  def peek_rear(%Quex{front: [item], rear: []}) do
     {:ok, item}
   end
 
@@ -186,16 +196,16 @@ defmodule Queue do
   It effectively appends the second queue to the first queue.
   """
   @spec join(t, t) :: t
-  def join(%Queue{} = q, %Queue{front: [], rear: []}) do
+  def join(%Quex{} = q, %Quex{front: [], rear: []}) do
     q
   end
 
-  def join(%Queue{front: [], rear: []}, %Queue{} = q) do
+  def join(%Quex{front: [], rear: []}, %Quex{} = q) do
     q
   end
 
-  def join(%Queue{front: f1, rear: r1}, %Queue{front: f2, rear: r2}) do
-    %Queue{front: f1 ++ :lists.reverse(r1, f2), rear: r2}
+  def join(%Quex{front: f1, rear: r1}, %Quex{front: f2, rear: r2}) do
+    %Quex{front: f1 ++ :lists.reverse(r1, f2), rear: r2}
   end
 
   @doc """
@@ -204,70 +214,60 @@ defmodule Queue do
   The front item of the queue will be the first element in the list.
   """
   @spec to_list(t) :: list
-  def to_list(%Queue{front: front, rear: rear}) do
+  def to_list(%Quex{front: front, rear: rear}) do
     front ++ :lists.reverse(rear, [])
-  end
-
-  @doc """
-  Converts a list to a queue
-
-  The first element in the list will be the front item of the queue.
-  """
-  @spec from_list(list) :: t
-  def from_list(items) do
-    f2r(items)
   end
 
   @doc "Converts a queue to Erlang's queue data type"
   @spec to_erl(t) :: {list, list}
-  def to_erl(%Queue{front: front, rear: rear}) do
+  def to_erl(%Quex{front: front, rear: rear}) do
     {rear, front}
   end
 
   @doc "Converts Erlang's queue data type to a queue"
   @spec from_erl({list, list}) :: t
   def from_erl({rear, front}) when is_list(rear) and is_list(front) do
-    %Queue{front: front, rear: rear}
+    %Quex{front: front, rear: rear}
   end
 
   @doc "Returns the number of items in the queue"
   @spec size(t) :: non_neg_integer
-  def size(%Queue{front: front, rear: rear}) do
+  def size(%Quex{front: front, rear: rear}) do
     length(front) + length(rear)
   end
 
   @doc "Returns true if the given value exists in the queue"
   @spec member?(t, term) :: boolean
-  def member?(%Queue{front: front, rear: rear}, item) do
+  def member?(%Quex{front: front, rear: rear}, item) do
     :lists.member(item, rear) or :lists.member(item, front)
   end
 
   # Move half of elements from rear to front, if there are at least three
-  defp r2f([]), do: %Queue{}
-  defp r2f([_] = rear), do: %Queue{front: [], rear: rear}
-  defp r2f([x, y]), do: %Queue{front: [y], rear: [x]}
+  defp r2f([]), do: %Quex{}
+  defp r2f([_] = rear), do: %Quex{front: [], rear: rear}
+  defp r2f([x, y]), do: %Quex{front: [y], rear: [x]}
 
   defp r2f(list) do
     {rear, front} = :lists.split(div(length(list), 2) + 1, list)
-    %Queue{front: :lists.reverse(front, []), rear: rear}
+    %Quex{front: :lists.reverse(front, []), rear: rear}
   end
 
   # Move half of elements from front to rear, if there are enough
-  defp f2r([]), do: %Queue{}
-  defp f2r([_] = front), do: %Queue{front: [], rear: front}
-  defp f2r([x, y]), do: %Queue{front: [x], rear: [y]}
+  defp f2r([]), do: %Quex{}
+  defp f2r([_] = front), do: %Quex{front: [], rear: front}
+  defp f2r([x, y]), do: %Quex{front: [x], rear: [y]}
 
   defp f2r(list) do
     {front, rear} = :lists.split(div(length(list), 2) + 1, list)
-    %Queue{front: front, rear: :lists.reverse(rear, [])}
+    %Quex{front: front, rear: :lists.reverse(rear, [])}
   end
 end
 
-defimpl Enumerable, for: Queue do
-  def count(queue), do: {:ok, Queue.size(queue)}
-  def member?(queue, x), do: {:ok, Queue.member?(queue, x)}
+defimpl Enumerable, for: Quex do
+  def count(queue), do: {:ok, Quex.size(queue)}
+  def member?(queue, x), do: {:ok, Quex.member?(queue, x)}
 
-  def reduce(%Queue{front: front, rear: rear}, acc, fun) do
+  def reduce(%Quex{front: front, rear: rear}, acc, fun) do
     rear_acc = do_reduce(front, acc, fun)
 
     case do_reduce(:lists.reverse(rear, []), rear_acc, fun) do
@@ -307,25 +307,30 @@ defimpl Enumerable, for: Queue do
   end
 
   def slice(queue) do
-    {:ok, Queue.size(queue), &Queue.to_list/1}
+    {:ok, Quex.size(queue), &Quex.to_list/1}
   end
 end
 
-defimpl Collectable, for: Queue do
+defimpl Collectable, for: Quex do
   def into(original) do
     {original,
      fn
-       queue, {:cont, item} -> Queue.put(queue, item)
-       queue, :done -> queue
-       _, :halt -> :ok
+       queue, {:cont, item} ->
+         Quex.put(queue, item)
+
+       %Quex{front: [front], rear: [rear | rest]} = queue, :done ->
+         %{queue | front: [front | :lists.reverse(rest)], rear: [rear]}
+
+       _, :halt ->
+         :ok
      end}
   end
 end
 
-defimpl Inspect, for: Queue do
+defimpl Inspect, for: Quex do
   import Inspect.Algebra
 
-  def inspect(%Queue{} = queue, opts) do
-    concat(["#Queue<", to_doc(Queue.to_list(queue), opts), ">"])
+  def inspect(%Quex{} = queue, opts) do
+    concat(["Quex.new(", to_doc(Quex.to_list(queue), opts), ")"])
   end
 end
